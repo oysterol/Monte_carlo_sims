@@ -14,8 +14,9 @@ class person:
         self.pathogens=[]
         self.current_pathogen=None
         self.mut_prob=0
-        self.recovery_chance=0.6
+        self.recovery_chance=0.1
         self.reinfection_chance=0
+        self.infection_chance=0.8
 
     def infect(self,pathogen):
         if pathogen in self.pathogens:
@@ -26,11 +27,11 @@ class person:
         else:
             self.pathogens.append(pathogen)
             self.current_pathogen=pathogen
-            if self.reinfection_chance< random.uniform(0,1):
+            if self.infection_chance< random.uniform(0,1):
                 self.infected=1
     
     def recover(self):
-        if self.recovery_chance<random.uniform(0,1):
+        if self.recovery_chance>random.uniform(0,1):
             self.infected=0
             self.current_pathogen=None
             return -1
@@ -94,13 +95,15 @@ class population:
                 continue
 
         for j in range(len(neighbours)):
-            if self.dim<=x+neighbours[j]:
+            if self.dim<=y+neighbours[j]:
                 self.population[x][0].infect(pathogen)
-            elif  x+neighbours[j]<0:
+                continue
+            elif  y+neighbours[j]<0:
                 self.population[x][-1].infect(pathogen)
-
+                continue
             elif self.population[x][y+neighbours[j]].infected==0:
                 self.population[x][y+neighbours[j]].infect(pathogen)
+                continue
 
 
     
@@ -136,8 +139,9 @@ class population:
     def recover(self):
         for i in range(len(self.population)):
             for j in range(len(self.population[0])):
-                self.total_infected+=self.population[i][j].recover()
-                print(self.total_infected)
+                if self.population[i][j].infected==2:
+                    self.total_infected+=self.population[i][j].recover()
+                    print(self.total_infected)
     
 
 
@@ -150,7 +154,7 @@ class population:
         self.create_patient_zero()
         while self.total_infected!=0:
             self.infection_timestep()
-            print(self.t)
+            
 
     
 
@@ -159,4 +163,4 @@ if __name__=="__main__":
     pop=population(20,0,0)
     pop.create_population()
     pop.infection_run_til_cured()
-    pop.show_infection()
+    print(pop.t)
