@@ -13,25 +13,22 @@ class person:
         self.infected=0
         self.pathogens=[]
         self.current_pathogen=None
-        self.mut_prob=0
-        self.recovery_chance=0.1
-        self.reinfection_chance=0
-        self.infection_chance=0.8
 
-    def infect(self,pathogen):
+
+    def infect(self,pathogen,mut_prob, reinfection_chance,infection_chance):
         if pathogen in self.pathogens:
             self.current_pathogen=pathogen
-            if self.reinfection_chance< random.uniform(0,1):
-                self.mutate(self.mut_prob)
+            if reinfection_chance< random.uniform(0,1):
+                self.mutate(mut_prob)
                 self.infected=1
         else:
             self.pathogens.append(pathogen)
             self.current_pathogen=pathogen
-            if self.infection_chance< random.uniform(0,1):
+            if infection_chance< random.uniform(0,1):
                 self.infected=1
     
-    def recover(self):
-        if self.recovery_chance>random.uniform(0,1):
+    def recover(self, recovery_chance):
+        if recovery_chance>random.uniform(0,1):
             self.infected=0
             self.current_pathogen=None
             return -1
@@ -47,7 +44,7 @@ class person:
 
 
 class population:
-    def __init__(self, size, p,q):
+    def __init__(self, size, p,q, mut_prob):
         self.dim=size
         self.p=p
         self.q=q
@@ -55,6 +52,10 @@ class population:
         self.total_infected=0
         self.t=0
         self.infection_prob=0.02
+        self.mut_prob=mut_prob
+        self.recovery_chance=0.9
+        self.reinfection_chance=q
+        self.infection_chance=p
 
 
     def create_population(self):
@@ -85,24 +86,24 @@ class population:
         pathogen=self.population[x][y].current_pathogen
         for i in range(len(neighbours)):
             if self.dim<=x+neighbours[i]:
-                self.population[0][y].infect(pathogen)
+                self.population[0][y].infect(pathogen, self.mut_prob, self.reinfection_chance, self.infection_chance)
                 continue
             elif  x+neighbours[i]<0:
-                self.population[-1][y].infect(pathogen)
+                self.population[-1][y].infect(pathogen, self.mut_prob, self.reinfection_chance, self.infection_chance)
                 continue
             elif self.population[x+neighbours[i]][y].infected==0:
-                self.population[x+neighbours[i]][y].infect(pathogen)
+                self.population[x+neighbours[i]][y].infect(pathogen, self.mut_prob, self.reinfection_chance, self.infection_chance)
                 continue
 
         for j in range(len(neighbours)):
             if self.dim<=y+neighbours[j]:
-                self.population[x][0].infect(pathogen)
+                self.population[x][0].infect(pathogen, self.mut_prob, self.reinfection_chance, self.infection_chance)
                 continue
             elif  y+neighbours[j]<0:
-                self.population[x][-1].infect(pathogen)
+                self.population[x][-1].infect(pathogen, self.mut_prob, self.reinfection_chance, self.infection_chance)
                 continue
             elif self.population[x][y+neighbours[j]].infected==0:
-                self.population[x][y+neighbours[j]].infect(pathogen)
+                self.population[x][y+neighbours[j]].infect(pathogen, self.mut_prob, self.reinfection_chance, self.infection_chance)
                 continue
 
 
@@ -140,7 +141,7 @@ class population:
         for i in range(len(self.population)):
             for j in range(len(self.population[0])):
                 if self.population[i][j].infected==2:
-                    self.total_infected+=self.population[i][j].recover()
+                    self.total_infected+=self.population[i][j].recover(self.recovery_chance)
                     print(self.total_infected)
     
 
@@ -160,7 +161,7 @@ class population:
 
 
 if __name__=="__main__":
-    pop=population(20,0,0)
+    pop=population(20,0.9,0.3,0.1)
     pop.create_population()
     pop.infection_run_til_cured()
     print(pop.t)

@@ -5,7 +5,7 @@ import sys
 import matplotlib.pyplot as plt
 
 
-def Montecarlo(F_size,p_steps):
+def Montecarlo_forest_fire(F_size,p_steps):
     p=np.linspace(0,1,p_steps)
     burnt=[]
     t_avg=[]
@@ -39,4 +39,4 @@ def Montecarlo(F_size,p_steps):
     plt.plot(p,t_avg)
     plt.show()
 
-Montecarlo(50,20)
+Montecarlo_forest_fire(50,20)
