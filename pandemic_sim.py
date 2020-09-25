@@ -9,8 +9,8 @@ class pathogen:
     pass
 
 class person:
-    def __init__(self,infected):
-        self.infected=infected
+    def __init__(self):
+        self.infected=0
         self.pathogens=[]
         self.current_pathogen=None
         self.mut_prob=0
@@ -20,13 +20,13 @@ class person:
     def infect(self,pathogen):
         if pathogen in self.pathogens:
             self.current_pathogen=pathogen
-            if pathogen.reinfection_chance< random.uniform(0,1):
+            if self.reinfection_chance< random.uniform(0,1):
                 self.mutate(self.mut_prob)
                 self.infected=1
         else:
             self.pathogens.append(pathogen)
             self.current_pathogen=pathogen
-            if pathogen.reinfection_chance< random.uniform(0,1):
+            if self.reinfection_chance< random.uniform(0,1):
                 self.infected=1
     
     def recover(self):
@@ -50,17 +50,17 @@ class population:
         self.dim=size
         self.p=p
         self.q=q
-        self.population=np.full((self.dim,self.dim), person)
+        self.population=np.full((self.dim,self.dim), person())
         self.total_infected=0
         self.t=0
         self.infection_prob=0.02
 
 
-    def create_population(self,size):
+    def create_population(self):
                 
         for i in range(len(self.population)):
             for j in range(len(self.population[0])):
-                self.population[i][j]=person(0)
+                self.population[i][j]=person()
 
     def show_infection(self,fig=plt,show=True):
         for i in range(len(self.population)):
@@ -83,37 +83,39 @@ class population:
         neighbours=[-1,1]
         pathogen=self.population[x][y].current_pathogen
         for i in range(len(neighbours)):
-            if self.dim<x+neighbours[i]:
+            if self.dim<=x+neighbours[i]:
                 self.population[0][y].infect(pathogen)
+                continue
             elif  x+neighbours[i]<0:
                 self.population[-1][y].infect(pathogen)
-
-            elif self.population[x+neighbours][y]==0:
-                self.population[x+neighbours][y].infect(pathogen)
+                continue
+            elif self.population[x+neighbours[i]][y].infected==0:
+                self.population[x+neighbours[i]][y].infect(pathogen)
+                continue
 
         for j in range(len(neighbours)):
-            if self.dim<x+neighbours[j]:
+            if self.dim<=x+neighbours[j]:
                 self.population[x][0].infect(pathogen)
             elif  x+neighbours[j]<0:
                 self.population[x][-1].infect(pathogen)
 
-            elif self.create_population[x][y+neighbours[j]].person.infected==0:
-                self.population[x][y+neighbours[j]].person.infect(pathogen)
+            elif self.population[x][y+neighbours[j]].infected==0:
+                self.population[x][y+neighbours[j]].infect(pathogen)
 
 
     
     
     def spread_across(self):
-        for i in range(len(self.dim)):
-            for j in range(len(self.dim[0])):
-               if self.population[i][j].person.infected==2:
+        for i in range(len(self.population)):
+            for j in range(len(self.population)):
+               if self.population[i][j].infected==2:
                    self.spread_individual(i,j)
 
     def manifest_infection(self):
-        for i in range(len(self.dim)):
-            for j in range(len(self.dim)):
-                if self.population[i][j].person.infected==1:
-                    self.population[i][j].person.infected=2
+        for i in range(len(self.population)):
+            for j in range(len(self.population[0])):
+                if self.population[i][j].infected==1:
+                    self.population[i][j].infected=2
                     self.total_infected+=1
 
 
@@ -132,20 +134,29 @@ class population:
     
 
     def recover(self):
-        for i in range(len(self.dim)):
-            for j in range(len(self.dim[0])):
-                total_infected+=self.population[i][j].person.recover()
+        for i in range(len(self.population)):
+            for j in range(len(self.population[0])):
+                self.total_infected+=self.population[i][j].recover()
+                print(self.total_infected)
     
 
 
     def infection_timestep(self):
         self.spread_across()
         self.recover()
+        self.t+=1
         
+    def infection_run_til_cured(self):
+        self.create_patient_zero()
+        while self.total_infected!=0:
+            self.infection_timestep()
+            print(self.t)
+
     
 
-pop=population(10,0,0)
 
-pop.show_infection()
-pop.create_patient_zero()
-pop.show_infection()
+if __name__=="__main__":
+    pop=population(20,0,0)
+    pop.create_population()
+    pop.infection_run_til_cured()
+    pop.show_infection()

@@ -15,7 +15,7 @@ class Forest:
     def __init__(self, dim, prob):
         self.dim=dim
         self.prob=prob
-        self.forest=np.full((self.dim,self.dim), Tree)
+        self.forest=np.full((self.dim,self.dim), Tree(0))
         self.t=0
         self.trees=0
         self.burnt=0
@@ -74,24 +74,20 @@ class Forest:
         
         self.forest[i][j].status=3
  
-    def set_ablaze(self):
+    def set_ablaze_and_extinguish(self):
         for i in range(len(self.forest[0])):
             for j in range(len(self.forest)):
                 if self.forest[i][j].status==1.5:
                     self.forest[i][j].status=2
-
-    def extinguish_ember(self):
-        for i in range(len(self.forest[0])):
-            for j in range(len(self.forest)):
                 if self.forest[i][j].status==3:
                     self.forest[i][j].status=4
-        self.burning-=1
-        self.burnt+=1
+                    self.burning-=1
+                    self.burnt+=1
+
 
     def burn_timestep(self):
                
-        self.extinguish_ember()
-        self.set_ablaze()
+        self.set_ablaze_and_extinguish()
         
         for i in range(len(self.forest[0])):
             for j in range(len(self.forest)):
@@ -113,12 +109,17 @@ class Forest:
             self.burn_timestep()
             if animate==True:
                 self.show()
-print('create forest')
-For=Forest(50,0.3)
-For.create_forest()
-print('burn it')
-For.burning_the_whole_sharade()
-For.show()
+
+if __name__=="__main__":
+    print('create forest')
+    For=Forest(50,0.8)
+    For.create_forest()
+    print('burn it')
+    For.burning_the_whole_sharade()
+    For.show()
+    print('Time before extinction :', For.t)
+    print('Total Trees :', For.trees)
+    print('Percent burnt :', For.burnt/For.trees)
 
                     
 

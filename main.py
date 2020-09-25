@@ -23,7 +23,7 @@ def Montecarlo(F_size,p_steps):
             For.create_forest()
             For.burning_the_whole_sharade()
             if For.trees!=0:
-                prob+=For.burnt/For.treess
+                prob+=For.burnt/For.trees
             t_a+=For.t
 
             del For
@@ -39,4 +39,4 @@ def Montecarlo(F_size,p_steps):
     plt.plot(p,t_avg)
     plt.show()
 
-#Montecarlo(50,20)
+Montecarlo(50,20)
