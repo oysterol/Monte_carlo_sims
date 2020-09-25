@@ -3,7 +3,7 @@ from forest_fire import Forest
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
-
+from pandemic_sim import population
 
 def Montecarlo_forest_fire(F_size,p_steps):
     p=np.linspace(0,1,p_steps)
@@ -38,5 +38,17 @@ def Montecarlo_forest_fire(F_size,p_steps):
     plt.show()
     plt.plot(p,t_avg)
     plt.show()
+
+def Montecarlo_pandemic(size, p_steps, ri_chance, mut_prob):
+    p=np.linspace(0,1,p_steps)
+    t_avg=[]
+    mont_size=size**2
+
+
+    sys.stdout.write("[%s]" % (" " * len(p)))
+    sys.stdout.flush()
+    sys.stdout.write("\b" * (len(p)+1)) 
+   
+
 
 Montecarlo_forest_fire(50,20)

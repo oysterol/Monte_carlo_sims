@@ -53,7 +53,7 @@ class population:
         self.t=0
         self.infection_prob=0.02
         self.mut_prob=mut_prob
-        self.recovery_chance=0.9
+        self.recovery_chance=0.4
         self.reinfection_chance=q
         self.infection_chance=p
 
@@ -133,7 +133,7 @@ class population:
                         self.population[i][j].pathogen=pathogenOG
                         self.population[i][j].infected=2
                         self.total_infected+=1
-                        print('infected')
+                       # print('infected')
 
     
 
@@ -142,7 +142,7 @@ class population:
             for j in range(len(self.population[0])):
                 if self.population[i][j].infected==2:
                     self.total_infected+=self.population[i][j].recover(self.recovery_chance)
-                    print(self.total_infected)
+                    #print(self.total_infected)
     
 
 
@@ -161,7 +161,7 @@ class population:
 
 
 if __name__=="__main__":
-    pop=population(20,0.9,0.3,0.1)
+    pop=population(50,0.9,0.3,0.1)
     pop.create_population()
     pop.infection_run_til_cured()
     print(pop.t)
