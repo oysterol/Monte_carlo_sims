@@ -15,7 +15,7 @@ class Forest:
     def __init__(self, dim, prob):
         self.dim=dim
         self.prob=prob
-        self.forest=np.full((dim,dim), Tree)
+        self.forest=np.full((self.dim,self.dim), Tree)
         self.t=0
         self.trees=0
         self.burnt=0
@@ -33,16 +33,19 @@ class Forest:
                     self.forest[i][j]=Tree(0)
 
 
-    def show(self):
+    def show(self,fig=plt, show=True):
         for i in range(len(self.forest)):
             for j in range(len(self.forest)):
                 if self.forest[i][j].status==1:
-                    plt.plot(i,j, 'go')
+                    fig.plot(i,j, 'go')
                 if self.forest[i][j].status==2:
-                    plt.plot(i,j, 'yo')
+                    fig.plot(i,j, 'yo')
                 if self.forest[i][j].status==3:
-                    plt.plot(i,j, 'ro')
-        plt.show()
+                    fig.plot(i,j, 'ro')
+                if self.forest[i][j].status==4:
+                    fig.plot(i,j, 'bo')
+        if show==True:
+            fig.show()
 
     def start_fire(self):
         for i in range(len(self.forest)):
@@ -52,7 +55,7 @@ class Forest:
                     
 
     def burn_neighbor(self,i,j):
-        if j-1>0 and self.forest[i][j-1].status==1:
+        if j-1>=0 and self.forest[i][j-1].status==1:
             self.forest[i][j-1].status=1.5
             self.burning+=1
 
@@ -65,41 +68,57 @@ class Forest:
             self.burning+=1
 
         
-        if i-1>0 and self.forest[i-1][j].status==1:
+        if i-1>=0 and self.forest[i-1][j].status==1:
             self.forest[i-1][j].status=1.5
             self.burning+=1
-
         
         self.forest[i][j].status=3
-        self.burnt+=1
-        self.burning-=1
-
+ 
     def set_ablaze(self):
         for i in range(len(self.forest[0])):
             for j in range(len(self.forest)):
                 if self.forest[i][j].status==1.5:
                     self.forest[i][j].status=2
 
+    def extinguish_ember(self):
+        for i in range(len(self.forest[0])):
+            for j in range(len(self.forest)):
+                if self.forest[i][j].status==3:
+                    self.forest[i][j].status=4
+        self.burning-=1
+        self.burnt+=1
 
     def burn_timestep(self):
+               
+        self.extinguish_ember()
         self.set_ablaze()
+        
         for i in range(len(self.forest[0])):
             for j in range(len(self.forest)):
                 if self.forest[i][j].status==2:
                     self.burn_neighbor(i,j)
+
         self.t+=1
     
 
-    def burning_the_whole_sharade(self):
+    def burning_the_whole_sharade(self, animate=False):
         self.start_fire()
-        while self.burning!=0:
+        if animate==True:
+            fig=plt.figure()
+            ax = fig.add_subplot(111)
+                
+
+        while self.burning!=0 and self.burning>0:
+
             self.burn_timestep()
-
-
-"""  For=Forest(50,0.6)
+            if animate==True:
+                self.show()
+print('create forest')
+For=Forest(50,0.3)
 For.create_forest()
-For.start_fire()
+print('burn it')
 For.burning_the_whole_sharade()
-For.show()"""
+For.show()
+
                     
 
