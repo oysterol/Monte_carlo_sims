@@ -13,6 +13,7 @@ class person:
         self.infected=0
         self.pathogens=[]
         self.current_pathogen=None
+        self.been_infected=0
 
 
     def infect(self,pathogen,mut_prob, reinfection_chance,infection_chance):
@@ -56,6 +57,8 @@ class population:
         self.recovery_chance=0.4
         self.reinfection_chance=q
         self.infection_chance=p
+        self.pop_infected=0
+        self.pop_total=self.dim*self.dim
 
 
     def create_population(self):
