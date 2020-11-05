@@ -1,12 +1,27 @@
 import numpy as np
 import random 
 import matplotlib.pyplot as plt
+import matplotlib.animation as anim
 import sys
+import time
 
 class Tree:
     def __init__(self,status):
         self.status=status
-    
+        self.color=None
+    def StatCol(self):
+        if self.status==1:
+            self.color='g'
+            return
+        elif self.status==2:
+            self.color='y'
+            return
+        elif self.status==3:
+            self.color='r'
+            return
+        elif self.status==4:
+            self.color='b'
+            return
 
 
 
@@ -20,7 +35,10 @@ class Forest:
         self.trees=0
         self.burnt=0
         self.burning=0
-       
+        self.fig=plt.figure()
+        self.ax=self.fig.add_subplot(111)
+        #self.fig,self.ax=plt.subplots()
+        
 
     def create_forest(self):
         
@@ -33,19 +51,6 @@ class Forest:
                     self.forest[i][j]=Tree(0)
 
 
-    def show(self,fig=plt, show=True):
-        for i in range(len(self.forest)):
-            for j in range(len(self.forest)):
-                if self.forest[i][j].status==1:
-                    fig.plot(i,j, 'go')
-                if self.forest[i][j].status==2:
-                    fig.plot(i,j, 'yo')
-                if self.forest[i][j].status==3:
-                    fig.plot(i,j, 'ro')
-                if self.forest[i][j].status==4:
-                    fig.plot(i,j, 'bo')
-        if show==True:
-            fig.show()
 
     def start_fire(self):
         for i in range(len(self.forest)):
@@ -95,31 +100,51 @@ class Forest:
                     self.burn_neighbor(i,j)
 
         self.t+=1
-    
 
-    def burning_the_whole_sharade(self, animate=False):
+        
+    def animate(self):
+        x_val=[]
+        y_val=[]
+        col=[]
+        plt.clf()
+        for i in range(len(self.forest)):
+            for j in range(len(self.forest)):
+                if self.forest[i][j].status!=0:
+                    self.forest[i][j].StatCol()
+                    if self.forest[i][j].color!='None':
+                        col.append(self.forest[i][j].color)
+                        x_val.append(i)
+                        y_val.append(j)
+                   # print(i,j,self.forest[i][j].color)
+        plt.scatter(x_val,y_val,c=col)
+        plt.pause(0.005)
+        
+       # plt.show()
+        
+
+    def burning_the_whole_sharade(self, animate_for=False):
         self.start_fire()
-        if animate==True:
-            fig=plt.figure()
-            ax = fig.add_subplot(111)
-                
-
+        if animate_for==True:
+            plt.ion()
+            self.animate()
+            
         while self.burning!=0 and self.burning>0:
-
             self.burn_timestep()
-            if animate==True:
-                self.show()
+            if animate_for==True:
+                self.animate()
+        #plt.show()
 
+        
 if __name__=="__main__":
     print('create forest')
     For=Forest(50,0.8)
     For.create_forest()
+
     print('burn it')
-    For.burning_the_whole_sharade()
-    For.show()
+    For.burning_the_whole_sharade(True)
     print('Time before extinction :', For.t)
     print('Total Trees :', For.trees)
     print('Percent burnt :', For.burnt/For.trees)
-
+ 
                     
 
